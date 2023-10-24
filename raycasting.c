@@ -4,14 +4,17 @@
 
 typedef SDL_Color Color;
 
-
-
 // Define some constant colors
-#define RED (Color){255, 0, 0, 255}
-#define GREEN (Color){0, 255, 0, 255}
-#define BLUE (Color){0, 0, 255, 255}
-#define WHITE (Color){255, 255, 255, 255}
-#define GREEN (Color){0, 255, 0, 255}
+#define RED \
+    (Color) { 255, 0, 0, 255 }
+#define GREEN \
+    (Color) { 0, 255, 0, 255 }
+#define BLUE \
+    (Color) { 0, 0, 255, 255 }
+#define WHITE \
+    (Color) { 255, 255, 255, 255 }
+#define GREEN \
+    (Color) { 0, 255, 0, 255 }
 
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
@@ -20,7 +23,6 @@ typedef SDL_Color Color;
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 #define FOV 60 // Field of view in degrees
-
 
 typedef struct
 {
@@ -41,28 +43,37 @@ typedef struct
     Color color;
 } Line;
 
-int findLineIntersection(Line line1, Line line2, Point *intersection)
+int findLineIntersection(Line line1, Line line2, Point *intersectionPoint)
 {
-    // Extract coordinates from line structures
-    double x1 = line1.start.x;
-    double y1 = line1.start.y;
-    double x2 = line1.end.x;
-    double y2 = line1.end.y;
-    double x3 = line2.start.x;
-    double y3 = line2.start.y;
-    double x4 = line2.end.x;
-    double y4 = line2.end.y;
+    int x1 = line1.start.x;
+    int y1 = line1.start.y;
+    int x2 = line1.end.x;
+    int y2 = line1.end.y;
 
-    double den = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
-    if (den == 0)
+    int x3 = line2.start.x;
+    int y3 = line2.start.y;
+    int x4 = line2.end.x;
+    int y4 = line2.end.y;
+
+    int denominator = (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4);
+
+    if (denominator != 0)
     {
-        return 0; // Lines are parallel or coincident
+        int px = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / denominator;
+        int py = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / denominator;
+
+        if ((px >= fmin(x1, x2) && px <= fmax(x1, x2)) &&
+            (py >= fmin(y1, y2) && py <= fmax(y1, y2)) &&
+            (px >= fmin(x3, x4) && px <= fmax(x3, x4)) &&
+            (py >= fmin(y3, y4) && py <= fmax(y3, y4)))
+        {
+            intersectionPoint->x = px;
+            intersectionPoint->y = py;
+            return 1; // Intersection found
+        }
     }
 
-    intersection->x = ((x1 * y2 - y1 * x2) * (x3 - x4) - (x1 - x2) * (x3 * y4 - y3 * x4)) / den;
-    intersection->y = ((x1 * y2 - y1 * x2) * (y3 - y4) - (y1 - y2) * (x3 * y4 - y3 * x4)) / den;
-
-    return 1; // Intersection found
+    return 0; // No intersection fou
 }
 
 Point rayPlaneIntersection(Point rayOrigin, Vector rayDirection, double wallPointX)
@@ -79,7 +90,6 @@ Point rayPlaneIntersection(Point rayOrigin, Vector rayDirection, double wallPoin
     return intersection;
 }
 
-
 void drawLine(SDL_Renderer *renderer, Line line, SDL_Color color)
 {
     SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
@@ -88,13 +98,14 @@ void drawLine(SDL_Renderer *renderer, Line line, SDL_Color color)
 }
 
 // draw a line at an angle
-void drawLineAtAnAngle(SDL_Renderer *renderer, Point start, double angle, int length, SDL_Color color, Line* resultLine)
+void drawLineAtAnAngle(SDL_Renderer *renderer, Point start, double angle, int length, SDL_Color color, Line *resultLine)
 {
     Point endPoint;
     endPoint.x = start.x + length * cos(angle);
     endPoint.y = start.y + length * sin(angle);
 
-    if (resultLine != NULL) {
+    if (resultLine != NULL)
+    {
         resultLine->start = start;
         resultLine->end = endPoint;
         resultLine->color = color;
@@ -188,13 +199,15 @@ int main()
         return 1;
     }
     /**********************************************************************************************/
-   
-   
+
     Point playerPosition = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-    Line wall = {{200, 400}, {300, 200}, RED};
+    Line ray;
+    Line wall = {{200, 400}, {0, 0}, RED};
 
-
+    Point interserctionPoint;
     double playerAngle = 0.0;
+    Point lineEndPoint = calculateLineEndpoint(playerPosition, playerAngle, 300);
+
     int radius = 10;
 
     int running = 1;
@@ -219,39 +232,43 @@ int main()
                     playerAngle += 0.1; // Move right
                     break;
                 case SDLK_UP:
-                    {
-                        Point movement = calculateMovementVector(playerAngle, 5); // Adjust speed as needed
+                {
+                    Point movement = calculateMovementVector(playerAngle, 5); // Adjust speed as needed
 
-                        playerPosition.x += movement.x;
-                        playerPosition.y += movement.y;
-                    }
-                    break;
+                    playerPosition.x += movement.x;
+                    playerPosition.y += movement.y;
+                }
+                break;
                 case SDLK_DOWN:
-                    {
-                        Point movement = calculateMovementVector(playerAngle, 5); // Adjust speed as needed
+                {
+                    Point movement = calculateMovementVector(playerAngle, 5); // Adjust speed as needed
 
-                        playerPosition.x -= movement.x;
-                        playerPosition.y -= movement.y;
-                    }
-                    break;
+                    playerPosition.x -= movement.x;
+                    playerPosition.y -= movement.y;
+                }
+                break;
                 }
             }
         }
 
-        
-        Point lineEndpoint = calculateLineEndpoint(playerPosition, playerAngle, 100);
-        Line ray = {playerPosition, lineEndpoint, GREEN};
+        lineEndPoint = calculateLineEndpoint(playerPosition, playerAngle, 300);
+        ray = (Line){playerPosition, lineEndPoint, GREEN};
 
         // Clear the renderer
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
-        // Render the line representing the wall
         drawPoint(renderer, playerPosition, radius, GREEN);
         drawLine(renderer, ray, WHITE);
 
         // Draw wall
-        drawLineAtAnAngle(renderer, wall.start, 100, 100, RED, &wall);
+        drawLineAtAnAngle(renderer, wall.start, 0, 500, RED, &wall);
+
+        if (findLineIntersection(ray, wall, &interserctionPoint) == 1)
+        {
+            drawPoint(renderer, interserctionPoint, 10, BLUE);
+        }
+   
 
         // ... (previous code)
 
