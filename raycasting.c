@@ -2,6 +2,17 @@
 #include <math.h>
 #include <stdio.h>
 
+typedef SDL_Color Color;
+
+
+
+// Define some constant colors
+#define RED (Color){255, 0, 0, 255}
+#define GREEN (Color){0, 255, 0, 255}
+#define BLUE (Color){0, 0, 255, 255}
+#define WHITE (Color){255, 255, 255, 255}
+#define GREEN (Color){0, 255, 0, 255}
+
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
 #endif
@@ -10,9 +21,6 @@
 #define SCREEN_HEIGHT 600
 #define FOV 60 // Field of view in degrees
 
-#define GREEN 0, 255, 0, 255
-#define WHITE 255, 255, 255, 255
-#define RED 255, 0, 0, 255
 
 typedef struct
 {
@@ -30,6 +38,7 @@ typedef struct
 {
     Point start;
     Point end;
+    Color color;
 } Line;
 
 int findLineIntersection(Line line1, Line line2, Point *intersection)
@@ -70,15 +79,34 @@ Point rayPlaneIntersection(Point rayOrigin, Vector rayDirection, double wallPoin
     return intersection;
 }
 
-void drawLine(SDL_Renderer *renderer, Line line, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+
+void drawLine(SDL_Renderer *renderer, Line line, SDL_Color color)
 {
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    // SDL_SetRenderDrawColor(renderer, r, g, b, a);
     SDL_RenderDrawLine(renderer, (int)line.start.x, (int)line.start.y, (int)line.end.x, (int)line.end.y);
 }
 
-void drawPoint(SDL_Renderer *renderer, Point center, int radius, Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+// draw a line at an angle
+void drawLineAtAnAngle(SDL_Renderer *renderer, Point start, double angle, int length, SDL_Color color, Line* resultLine)
 {
-    SDL_SetRenderDrawColor(renderer, r, g, b, a);
+    Point endPoint;
+    endPoint.x = start.x + length * cos(angle);
+    endPoint.y = start.y + length * sin(angle);
+
+    if (resultLine != NULL) {
+        resultLine->start = start;
+        resultLine->end = endPoint;
+        resultLine->color = color;
+    }
+
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
+    SDL_RenderDrawLine(renderer, start.x, start.y, endPoint.x, endPoint.y);
+}
+
+void drawPoint(SDL_Renderer *renderer, Point center, int radius, SDL_Color color)
+{
+    SDL_SetRenderDrawColor(renderer, color.r, color.g, color.b, color.a);
     for (int dy = 0; dy <= radius; dy++)
     {
         int dx = (int)round(sqrt(radius * radius - dy * dy));
@@ -160,9 +188,14 @@ int main()
         return 1;
     }
     /**********************************************************************************************/
+   
+   
     Point playerPosition = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
-    Line wall = {{200, 400}, {300, 200}};
+    Line wall = {{200, 400}, {300, 200}, RED};
+
+
     double playerAngle = 0.0;
+    int radius = 10;
 
     int running = 1;
     SDL_Event event;
@@ -207,15 +240,18 @@ int main()
 
         
         Point lineEndpoint = calculateLineEndpoint(playerPosition, playerAngle, 100);
-        Line ray = {playerPosition, lineEndpoint};
+        Line ray = {playerPosition, lineEndpoint, GREEN};
 
         // Clear the renderer
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         SDL_RenderClear(renderer);
 
         // Render the line representing the wall
-        drawPoint(renderer, playerPosition, 10, GREEN);
+        drawPoint(renderer, playerPosition, radius, GREEN);
         drawLine(renderer, ray, WHITE);
+
+        // Draw wall
+        drawLineAtAnAngle(renderer, wall.start, 100, 100, RED, &wall);
 
         // ... (previous code)
 
