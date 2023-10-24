@@ -43,6 +43,61 @@ typedef struct
     Color color;
 } Line;
 
+typedef struct {
+    Point start;
+    Point end;
+    Color color;
+    int length;
+    // void (*update)(struct Ray* ray, Point playerPosition, double angle);
+} Ray;
+
+// void updateRay(Ray* ray, Point playerPosition, double angle) {
+//     ray->start = playerPosition;
+//     ray->end = calculateLineEndpoint(playerPosition, angle, ray->length);
+// }
+
+
+typedef struct 
+{
+    Point position;
+    double angle;
+    double speed;
+    double fov;
+    double viewDistance;
+    Color color;
+    Ray ray;
+
+} Player;
+
+Point calculateLineEndpoint(Point playerPosition, double angle, int length)
+{
+    Point endpoint;
+    endpoint.x = playerPosition.x + length * cos(angle);
+    endpoint.y = playerPosition.y + length * sin(angle);
+    return endpoint;
+}
+
+
+
+
+Player createPlayer(Point position, double angle, double speed, double fov, double viewDistance, Color color, int rayLength)
+{
+    Player player;
+    player.position = position;
+    player.angle = angle;
+    player.speed = speed;
+    player.fov = fov;
+    player.viewDistance = viewDistance;
+    player.color = color;
+
+    player.ray.start = position;
+    player.ray.length = rayLength;
+    player.ray.color = GREEN;
+    // player.ray.update = updateRay;
+
+    return player;
+}
+
 int findLineIntersection(Line line1, Line line2, Point *intersectionPoint)
 {
     int x1 = line1.start.x;
@@ -128,13 +183,7 @@ void drawPoint(SDL_Renderer *renderer, Point center, int radius, SDL_Color color
     }
 }
 
-Point calculateLineEndpoint(Point playerPosition, double angle, int length)
-{
-    Point endpoint;
-    endpoint.x = playerPosition.x + length * cos(angle);
-    endpoint.y = playerPosition.y + length * sin(angle);
-    return endpoint;
-}
+
 
 Point calculateMovementVector(double angle, double speed)
 {
