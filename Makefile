@@ -1,14 +1,24 @@
 CC = gcc
-CFLAGS = -Wall -Wextra -std=c99 -I/usr/include/SDL2
+CFLAGS = -Wall -Wextra -std=c99 -Iinclude -I/usr/include/SDL2
 LIBS = -lSDL2 -lm
 
-all: raycasting
+SRC_DIR = src
+OBJ_DIR = obj
+INCLUDE_DIR = include
+BIN_DIR = bin
 
-raycasting: raycasting.o
-	$(CC) $(CFLAGS) -o raycasting raycasting.o $(LIBS)
+SRCS = $(wildcard $(SRC_DIR)/*.c)
+OBJS = $(patsubst $(SRC_DIR)/%.c,$(OBJ_DIR)/%.o,$(SRCS))
 
-raycasting.o: raycasting.c
-	$(CC) $(CFLAGS) -c raycasting.c
+TARGET = $(BIN_DIR)/raycasting
+
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	$(CC) $(CFLAGS) -o $@ $^ $(LIBS)
+
+$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+	$(CC) $(CFLAGS) -c -o $@ $< -I$(INCLUDE_DIR)
 
 clean:
-	rm -f raycasting raycasting.o
+	rm -f $(TARGET) $(OBJS)
