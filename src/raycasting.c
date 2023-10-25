@@ -43,7 +43,7 @@ int main()
                     break;
                 case SDLK_UP:
                 {
-                    Point movement = calculateMovementVector(playerAngle, 5); // Adjust speed as needed
+                    Point movement = calculateMovementVector(playerAngle, PLAYER_SPEED); // Adjust speed as needed
 
                     playerPosition.x += movement.x;
                     playerPosition.y += movement.y;
@@ -51,7 +51,7 @@ int main()
                 break;
                 case SDLK_DOWN:
                 {
-                    Point movement = calculateMovementVector(playerAngle, 5); // Adjust speed as needed
+                    Point movement = calculateMovementVector(playerAngle, PLAYER_SPEED); // Adjust speed as needed
 
                     playerPosition.x -= movement.x;
                     playerPosition.y -= movement.y;
@@ -61,7 +61,7 @@ int main()
             }
         }
         // Clear the renderer
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a);
         SDL_RenderClear(renderer);
 
         lineEndPoint = calculateLineEndpoint(playerPosition, playerAngle, 300);

@@ -4,7 +4,6 @@
 
 #include <SDL2/SDL.h>
 
-
 typedef SDL_Color Color;
 
 #define RED \
@@ -15,13 +14,15 @@ typedef SDL_Color Color;
     (Color) { 0, 0, 255, 255 }
 #define WHITE \
     (Color) { 255, 255, 255, 255 }
+#define BLACK \
+    (Color) { 0, 0, 0, 255 }
 
 #ifndef M_PI
 #define M_PI (3.14159265358979323846)
 #endif
 
-
-#define FOV 60 // Field of view in degrees
+#define PLAYER_SPEED 5
+#define FOV 60.0
 
 typedef struct
 {
@@ -137,5 +138,19 @@ void drawLineAtAnAngle(SDL_Renderer *renderer, Point start, double angle, int le
  * @param color The color of the point.
  */
 void drawPoint(SDL_Renderer *renderer, Point center, int radius, SDL_Color color);
+
+/**
+ * Draws rays from the player to the walls.
+ * @param renderer The renderer used for drawing.
+ * @param playerPosition The position of the player.
+ * @param playerAngle The angle of the player.
+ * @param numRays The number of rays to be drawn.
+ * @param FOV The field of view in degrees.
+ * @param rayLength The length of the ray.
+ * @param walls The walls to be checked for intersections.
+ * @param numWalls The number of walls.
+ * @param color The color of the ray.
+ */
+void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, int numRays, int rayLength, Line *walls, int numWalls, SDL_Color color);
 
 #endif

@@ -11,7 +11,6 @@ Point calculateLineEndpoint(Point playerPosition, double angle, int length)
     return endpoint;
 }
 
-
 Player createPlayer(Point position, double angle, double speed, double fov, double viewDistance, Color color, int rayLength)
 {
     Player player;
@@ -114,12 +113,43 @@ void drawPoint(SDL_Renderer *renderer, Point center, int radius, SDL_Color color
     }
 }
 
-
-
 Point calculateMovementVector(double angle, double speed)
 {
     Point movement;
     movement.x = speed * cos(angle);
     movement.y = speed * sin(angle);
     return movement;
+}
+
+void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, int numRays, int rayLength, Line *walls, int numWalls, SDL_Color color)
+{
+    double angleIncrement = FOV / (numRays - 1);
+
+    for (int i = 0; i < numRays; i++)
+    {
+        double rayAngle = playerAngle - (FOV / 2) + i * angleIncrement;
+
+        Point lineEndPoint = calculateLineEndpoint(playerPosition, rayAngle, rayLength);
+        Line ray = {playerPosition, lineEndPoint, color};
+
+        Point intersectionPoint;
+        int hasIntersection = 0;
+
+        for (int j = 0; j < numWalls; j++)
+        {
+            if (findLineIntersection(ray, walls[j], &intersectionPoint) == 1)
+            {
+                hasIntersection = 1;
+                ray.end = intersectionPoint;
+                break;
+            }
+        }
+
+        if (!hasIntersection)
+        {
+            ray.end = lineEndPoint;
+        }
+
+        drawLine(renderer, ray, color);
+    }
 }
