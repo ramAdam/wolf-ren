@@ -1,6 +1,4 @@
-#include <SDL2/SDL.h>
-#include "raycasting_utils.h"
-#include "sdl_init.h"
+#include "raycasting.h"
 
 int main()
 {
@@ -62,13 +60,13 @@ int main()
                 }
             }
         }
+        // Clear the renderer
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
 
         lineEndPoint = calculateLineEndpoint(playerPosition, playerAngle, 300);
         ray = (Line){playerPosition, lineEndPoint, GREEN};
 
-        // Clear the renderer
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-        SDL_RenderClear(renderer);
 
         drawPoint(renderer, playerPosition, radius, GREEN);
         drawLine(renderer, ray, WHITE);

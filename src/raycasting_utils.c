@@ -1,6 +1,5 @@
 
 #include "raycasting_utils.h"
-#include <SDL2/SDL.h>
 #include <math.h>
 #include <stdio.h>
 
@@ -26,7 +25,6 @@ Player createPlayer(Point position, double angle, double speed, double fov, doub
     player.ray.start = position;
     player.ray.length = rayLength;
     player.ray.color = GREEN;
-    // player.ray.update = updateRay;
 
     return player;
 }

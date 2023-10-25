@@ -1,7 +1,9 @@
 
 #ifndef RAYCASTING_UTILS_H
 #define RAYCASTING_UTILS_H
+
 #include <SDL2/SDL.h>
+
 
 typedef SDL_Color Color;
 
