@@ -21,7 +21,10 @@ typedef SDL_Color Color;
 #define M_PI (3.14159265358979323846)
 #endif
 
+#define PLAYER_POSITION (Point) { SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 }
+#define PLAYER_COLLISION_DIST 15
 #define PLAYER_SPEED 5
+
 #define FOV (60.0 * M_PI / 180.0) // Field of view in radians
 
 
@@ -154,14 +157,21 @@ void drawPoint(SDL_Renderer *renderer, Point center, int radius, SDL_Color color
  */
 void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, int numRays, int rayLength, Line *walls, int numWalls, SDL_Color color);
 
-
-
 /*
 * Moves the player based on the given event.
 * @param event The event to be handled.
 * @param playerPosition A pointer to the player's position.
 * @param playerAngle A pointer to the player's angle.
 */
-void movePlayer(SDL_Event event, Point *playerPosition, double *playerAngle);
+void movePlayer(SDL_Event event, Line *walls, int numOfWalls, Point *playerPosition, double *playerAngle);
+
+/*
+* Checks if the player is colliding with a wall.
+* @param walls The walls to be checked for collisions.
+* @param numWalls The number of walls.
+*/
+
+
+int checkPlayerWallCollision(Line *walls, int numWalls, Point playerPosition, double playerAngle, int playerMovementLength);
 
 #endif

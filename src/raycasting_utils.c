@@ -145,39 +145,75 @@ void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, 
             }
         }
 
+        // !hasIntersection ? ray.end = lineEndPoint : drawPoint(renderer, intersectionPoint, 4, RED);
+
         if (!hasIntersection)
         {
             ray.end = lineEndPoint;
-        }else
+        }
+        else
         {
-            drawPoint(renderer, intersectionPoint, 4 , RED);
+            drawPoint(renderer, intersectionPoint, 4, RED);
         }
 
         drawLine(renderer, ray, color);
     }
 }
 
-void movePlayer(SDL_Event event, Point *playerPosition, double *playerAngle) {
-    if (event.type == SDL_KEYDOWN) {
-        switch (event.key.keysym.sym) {
-            case SDLK_LEFT:
-                *playerAngle -= 0.1; // Move left
-                break;
-            case SDLK_RIGHT:
-                *playerAngle += 0.1; // Move right
-                break;
-            case SDLK_UP: {
+void movePlayer(SDL_Event event, Line *walls, int numOfWalls, Point *playerPosition, double *playerAngle)
+{
+    if (event.type == SDL_KEYDOWN)
+    {
+        switch (event.key.keysym.sym)
+        {
+        case SDLK_LEFT:
+            *playerAngle -= 0.1; // Move left
+            break;
+        case SDLK_RIGHT:
+            *playerAngle += 0.1; // Move right
+            break;
+        case SDLK_UP:
+        {
+            int collision = checkPlayerWallCollision(walls, 2, *playerPosition, *playerAngle, PLAYER_COLLISION_DIST);
+            if (collision != 1)
+            {
                 Point movement = calculateMovementVector(*playerAngle, PLAYER_SPEED);
                 playerPosition->x += movement.x;
                 playerPosition->y += movement.y;
             }
-                break;
-            case SDLK_DOWN: {
+        }
+        break;
+        case SDLK_DOWN:
+        {
+            double angle = *playerAngle + M_PI;
+            int collision = checkPlayerWallCollision(walls, 2, *playerPosition, angle, PLAYER_COLLISION_DIST);
+            if (collision != 1)
+            {
                 Point movement = calculateMovementVector(*playerAngle, PLAYER_SPEED);
                 playerPosition->x -= movement.x;
                 playerPosition->y -= movement.y;
             }
-                break;
+        }
+        break;
         }
     }
+}
+
+int checkPlayerWallCollision(Line *walls, int numWalls, Point playerPosition, double playerAngle, int playerMovementLength)
+{
+    Line playerLine = {
+        .start = playerPosition,
+        .end = calculateLineEndpoint(playerPosition, playerAngle, playerMovementLength)};
+
+    for (int i = 0; i < numWalls; i++)
+    {
+        Point intersectionPoint;
+        if (findLineIntersection(playerLine, walls[i], &intersectionPoint))
+        {
+            // Intersection detected, handle it here if needed
+            return 1; // Collision detected
+        }
+    }
+
+    return 0; // No collision
 }

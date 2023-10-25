@@ -13,7 +13,7 @@ int main()
     Point playerPosition = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
     Line ray;
 
-    Line wall = {{200, 400}, {0, 0}, RED};
+    Line wall = {{200, 600}, {0, 0}, RED};
     // draw wall above wall
     Line wall2 = {{200, 200}, {200, 0}, RED};
 
@@ -38,34 +38,7 @@ int main()
             {
                 running = 0;
             }
-            if (event.type == SDL_KEYDOWN)
-            {
-                switch (event.key.keysym.sym)
-                {
-                case SDLK_LEFT:
-                    playerAngle -= 0.1; // Move left
-                    break;
-                case SDLK_RIGHT:
-                    playerAngle += 0.1; // Move right
-                    break;
-                case SDLK_UP:
-                {
-                    Point movement = calculateMovementVector(playerAngle, PLAYER_SPEED); // Adjust speed as needed
-
-                    playerPosition.x += movement.x;
-                    playerPosition.y += movement.y;
-                }
-                break;
-                case SDLK_DOWN:
-                {
-                    Point movement = calculateMovementVector(playerAngle, PLAYER_SPEED); // Adjust speed as needed
-
-                    playerPosition.x -= movement.x;
-                    playerPosition.y -= movement.y;
-                }
-                break;
-                }
-            }
+            movePlayer(event, walls, 2, &playerPosition, &playerAngle);
         }
         // Clear the renderer
         SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a);
