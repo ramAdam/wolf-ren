@@ -22,7 +22,8 @@ typedef SDL_Color Color;
 #endif
 
 #define PLAYER_SPEED 5
-#define FOV 60.0
+#define FOV (60.0 * M_PI / 180.0) // Field of view in radians
+
 
 typedef struct
 {
@@ -152,5 +153,15 @@ void drawPoint(SDL_Renderer *renderer, Point center, int radius, SDL_Color color
  * @param color The color of the ray.
  */
 void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, int numRays, int rayLength, Line *walls, int numWalls, SDL_Color color);
+
+
+
+/*
+* Moves the player based on the given event.
+* @param event The event to be handled.
+* @param playerPosition A pointer to the player's position.
+* @param playerAngle A pointer to the player's angle.
+*/
+void movePlayer(SDL_Event event, Point *playerPosition, double *playerAngle);
 
 #endif

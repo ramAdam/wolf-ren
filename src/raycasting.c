@@ -1,18 +1,25 @@
 #include "raycasting.h"
 
+#define ASSERT(_e, ...) if (!(_e)) { fprintf(stderr, __VA_ARGS__); exit(1); }
+
+
 int main()
 {
     SDL_Window *window = NULL;
     SDL_Renderer *renderer = NULL;
 
-    if (initializeSDL(&window, &renderer) != 0)
-    {
-        return 1; // Error occurred during initialization
-    }
+    ASSERT(initializeSDL(&window, &renderer) == 0, "Error occurred during SDL initialization\n");
 
     Point playerPosition = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2};
     Line ray;
+
     Line wall = {{200, 400}, {0, 0}, RED};
+    // draw wall above wall
+    Line wall2 = {{200, 200}, {200, 0}, RED};
+
+
+
+    Line walls[] = {wall, wall2};
 
     Point interserctionPoint;
     double playerAngle = 0.0;
@@ -64,22 +71,11 @@ int main()
         SDL_SetRenderDrawColor(renderer, BLACK.r, BLACK.g, BLACK.b, BLACK.a);
         SDL_RenderClear(renderer);
 
-        lineEndPoint = calculateLineEndpoint(playerPosition, playerAngle, 300);
-        ray = (Line){playerPosition, lineEndPoint, GREEN};
+        
 
-
-        drawPoint(renderer, playerPosition, radius, GREEN);
-        drawLine(renderer, ray, WHITE);
-
-        // Draw wall
-        drawLineAtAnAngle(renderer, wall.start, 0, 600, RED, &wall);
-
-        if (findLineIntersection(ray, wall, &interserctionPoint) == 1)
-        {
-            drawPoint(renderer, interserctionPoint, 4, GREEN);
-        }
-
-
+        drawRays(renderer, playerPosition, playerAngle, 10, SCREEN_HEIGHT, walls, 2, WHITE);
+        drawLineAtAnAngle(renderer, walls[0].start, 0, 600, RED, &walls[0]);
+        drawLineAtAnAngle(renderer, walls[1].start, 0, 600, RED, &walls[1]);
 
         // Present the rendered frame
         SDL_RenderPresent(renderer);

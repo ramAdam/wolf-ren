@@ -1,4 +1,3 @@
-
 #include "raycasting_utils.h"
 #include <math.h>
 #include <stdio.h>
@@ -125,6 +124,7 @@ void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, 
 {
     double angleIncrement = FOV / (numRays - 1);
 
+    drawPoint(renderer, playerPosition, 10, GREEN);
     for (int i = 0; i < numRays; i++)
     {
         double rayAngle = playerAngle - (FOV / 2) + i * angleIncrement;
@@ -148,8 +148,36 @@ void drawRays(SDL_Renderer *renderer, Point playerPosition, double playerAngle, 
         if (!hasIntersection)
         {
             ray.end = lineEndPoint;
+        }else
+        {
+            drawPoint(renderer, intersectionPoint, 4 , RED);
         }
 
         drawLine(renderer, ray, color);
+    }
+}
+
+void movePlayer(SDL_Event event, Point *playerPosition, double *playerAngle) {
+    if (event.type == SDL_KEYDOWN) {
+        switch (event.key.keysym.sym) {
+            case SDLK_LEFT:
+                *playerAngle -= 0.1; // Move left
+                break;
+            case SDLK_RIGHT:
+                *playerAngle += 0.1; // Move right
+                break;
+            case SDLK_UP: {
+                Point movement = calculateMovementVector(*playerAngle, PLAYER_SPEED);
+                playerPosition->x += movement.x;
+                playerPosition->y += movement.y;
+            }
+                break;
+            case SDLK_DOWN: {
+                Point movement = calculateMovementVector(*playerAngle, PLAYER_SPEED);
+                playerPosition->x -= movement.x;
+                playerPosition->y -= movement.y;
+            }
+                break;
+        }
     }
 }
